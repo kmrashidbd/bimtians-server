@@ -8,6 +8,7 @@ module.exports = {
     register: async (req, res) => {
         const { email, password, gender, mobile } = req.body;
         const existingUser = await Student.findOne({ where: { email: email } });
+        console.log(existingUser)
         if (existingUser === null) {
             return bcrypt.hash(password, 11, (err, hash) => {
                 if (err) {

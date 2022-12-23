@@ -14,12 +14,12 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 });
 
 sequelize.authenticate()
-    .then(()=>{
-        console.log('connected successfully')
-    })
-    .catch(err=>{
-        console.log(err)
-    })
+  .then(() => {
+    console.log('connected successfully')
+  })
+  .catch(err => {
+    console.log(err)
+  })
 
 const db = {};
 
@@ -32,20 +32,30 @@ db.academic_info = require('./academicModel')(sequelize, DataTypes);
 db.employment_info = require('./employmentModel')(sequelize, DataTypes);
 db.others_info = require('./othersModel')(sequelize, DataTypes);
 
-db.sequelize.sync({force: false})
-.then(()=>{
+db.sequelize.sync({ force: false })
+  .then(() => {
     console.log('re sync done');
+  })
+
+// user connection with varius model
+db.student.hasOne(db.personal_info, {
+  foreignKey: 'student',
+  as: 'personal-info'
 })
 
-//user connection with post model
-// db.student.belongsTo(db.personal_info,{
-//     foreignKey: 'student_id',
-//     as: 'personal-info'
-// })
+db.student.hasOne(db.academic_info, {
+  foreignKey: 'student',
+  as: 'academic-info'
+})
 
-// db.personal_info.belongsTo(db.academic_info,{
-//     foreignKey: 'student_id',
-//     as: 'academic-info'
-// })
+db.student.hasOne(db.employment_info, {
+  foreignKey: 'student',
+  as: 'employment-info'
+})
+
+db.student.hasOne(db.others_info, {
+  foreignKey: 'student',
+  as: 'others-info'
+})
 
 module.exports = db;
