@@ -6,15 +6,15 @@ const Student = db.student;
 
 module.exports = {
     register: async (req, res) => {
-        const { email, password, gender, mobile } = req.body;
+        const { name, email, password, gender, mobile } = req.body;
         const existingUser = await Student.findOne({ where: { email: email } });
-        console.log(existingUser)
+        console.log(existingUser, name)
         if (existingUser === null) {
             return bcrypt.hash(password, 11, (err, hash) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    const newUser = { email, password: hash, mobile, gender };
+                    const newUser = { name, email, password: hash, mobile, gender };
                     Student.create(newUser)
                         .then((user) => {
                             res.status(201).json({
@@ -70,6 +70,14 @@ module.exports = {
                 };
             });
         };
+    },
+    loggedInStudent: async (req, res) => {
+        const { email } = req.user;
+        const student = await Student.findOne({
+            where: { email: email },
+            attributes: ["email", "name", "role", "status"] ,
+        });
+        res.status(200).json(student)
     },
     updateById: async (req, res) => {
         const id = req.params.id;
