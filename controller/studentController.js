@@ -78,7 +78,26 @@ module.exports = {
       })
     }
   },
-  addStudentDetails: async (req, res) => {
+  addStudentPersonalDetails: async (req, res) => {
+    const student = req.user.id;
+    const newStudentDetails = {student, ...req.body}
+    const registerd = await Personal.findOne({where: {student: student}});
+    if(registerd !== null){
+      return res.status(400).json({
+        message: 'Personal Details Already Added'
+      })
+    }else{
+      const details = await Personal.create(newStudentDetails);
+      res.status(201).json(details)
+    }
+  },
+  addStudentEmploymentDetails: async (req, res) => {
+    
+  },
+  addStudentAcademicDetails: async (req, res) => {
+    
+  },
+  addStudentOthersDetails: async (req, res) => {
     
   },
   updateStudentDetails: async (req, res) => {
