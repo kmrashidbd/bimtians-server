@@ -75,7 +75,7 @@ module.exports = {
         const { email } = req.user;
         const student = await Student.findOne({
             where: { email: email },
-            attributes: ["email", "name", "role", "status"] ,
+            attributes: ["id", "email", "name", "role", "status"] ,
         });
         res.status(200).json(student)
     },

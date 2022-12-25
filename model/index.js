@@ -40,22 +40,22 @@ db.sequelize.sync({ force: false })
 // user connection with varius model
 db.student.hasOne(db.personal_info, {
   foreignKey: 'student',
-  as: 'personal-info'
+  as: 'personal_info'
 })
 
 db.student.hasOne(db.academic_info, {
   foreignKey: 'student',
-  as: 'academic-info'
+  as: 'academic_info'
 })
 
 db.student.hasOne(db.employment_info, {
   foreignKey: 'student',
-  as: 'employment-info'
+  as: 'employment_info'
 })
 
 db.student.hasOne(db.others_info, {
   foreignKey: 'student',
-  as: 'others-info'
+  as: 'others_info'
 })
 
 module.exports = db;

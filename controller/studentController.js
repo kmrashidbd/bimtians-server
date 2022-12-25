@@ -3,6 +3,7 @@ const db = require('../model');
 const Student = db.student;
 const Personal = db.personal_info;
 const Employment = db.employment_info;
+const Academic = db.academic_info;
 const Others = db.others_info;
 
 
@@ -13,17 +14,22 @@ module.exports = {
       include: [
         {
           model: Personal,
-          as: "personal-info", //same as models/index.js
+          as: "personal_info", //same as models/index.js
           attributes: { exclude: ["user"] },
         },
         {
           model: Employment,
-          as: "employment-info", //same as models/index.js
+          as: "employment_info", //same as models/index.js
+          attributes: { exclude: ["user"] },
+        },
+        {
+          model: Academic,
+          as: "academic_info", //same as models/index.js
           attributes: { exclude: ["user"] },
         },
         {
           model: Others,
-          as: "others-info", //same as models/index.js
+          as: "others_info", //same as models/index.js
           attributes: { exclude: ["user"] },
         },
       ],
@@ -44,17 +50,22 @@ module.exports = {
       include: [
         {
           model: Personal,
-          as: "personal-info", //same as models/index.js
+          as: "personal_info", //same as models/index.js
           attributes: { exclude: ["user"] },
         },
         {
           model: Employment,
-          as: "employment-info", //same as models/index.js
+          as: "employment_info", //same as models/index.js
+          attributes: { exclude: ["user"] },
+        },
+        {
+          model: Academic,
+          as: "academic_info", //same as models/index.js
           attributes: { exclude: ["user"] },
         },
         {
           model: Others,
-          as: "others-info", //same as models/index.js
+          as: "others_info", //same as models/index.js
           attributes: { exclude: ["user"] },
         },
       ]

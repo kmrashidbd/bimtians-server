@@ -3,9 +3,8 @@ module.exports = (sequelize, DataTypes) => {
         student: {
             type: DataTypes.UUID
         },
-        name: {
+        photo:{
             type: DataTypes.STRING,
-            allowNull: false,
         },
         father: {
             type: DataTypes.STRING,
