@@ -1,5 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
     const AcademicInfo = sequelize.define("academic_info", {
+        id:{
+          type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
+          primaryKey: true
+        },
         student: {
             type: DataTypes.UUID
         },

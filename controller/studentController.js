@@ -46,27 +46,27 @@ module.exports = {
     const id = req.params.id;
     const student = await Student.findOne({
       where: {id: id},
-      attributes: {exclude: ["password"]},
+      attributes: {exclude: ["id","password"]},
       include: [
         {
           model: Personal,
           as: "personal_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["id","student"] },
         },
         {
           model: Employment,
           as: "employment_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["id","student"] },
         },
         {
           model: Academic,
           as: "academic_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["id","student"] },
         },
         {
           model: Others,
           as: "others_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["id","student"] },
         },
       ]
     });
@@ -90,15 +90,6 @@ module.exports = {
       const details = await Personal.create(newStudentDetails);
       res.status(201).json(details)
     }
-  },
-  addStudentEmploymentDetails: async (req, res) => {
-    
-  },
-  addStudentAcademicDetails: async (req, res) => {
-    
-  },
-  addStudentOthersDetails: async (req, res) => {
-    
   },
   updateStudentDetails: async (req, res) => {
 

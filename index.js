@@ -13,6 +13,7 @@ app.use(cors());
 //external route
 app.use('/api/v1/auth', require('./routes/authRoute'));
 app.use('/api/v1/student', require('./routes/studentRoute'));
+app.use('/api/v1/external', require('./routes/externalRoute'));
 
 app.get('/', (req, res)=>{
     res.send('Marine Student Database Is Running Successfully')

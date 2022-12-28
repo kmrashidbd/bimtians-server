@@ -4,9 +4,7 @@ const verifyToken = require('../lib/verifyToken');
 
 router.get('/all', studentController.getAllStudent);
 router.post('/addPersonal', verifyToken, studentController.addStudentPersonalDetails);
-router.post('/addEmployment', verifyToken, studentController.addStudentEmploymentDetails);
-router.post('/addAcademic', verifyToken, studentController.addStudentAcademicDetails);
-router.post('/addOthers', verifyToken, studentController.addStudentOthersDetails);
+router.put('/editPersonal', verifyToken, studentController.updateStudentDetails);
 router.route('/:id')
 .get(studentController.getStudentById)
 
