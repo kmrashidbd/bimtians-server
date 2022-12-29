@@ -25,6 +25,7 @@ module.exports = {
         const {id} = req.user;
         const result = await Employment.update(req.body, {where: {student: id}});
         console.log(result)
+        res.send('working')
     },
     addAcademic: async (req, res) => {
         const student = req.user;
