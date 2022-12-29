@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         passingYear: {
             type: DataTypes.STRING,
-            defaultValue: "student",
+            defaultValue: 0,
         },        
     }, {
         timestamps: false
