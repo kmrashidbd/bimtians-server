@@ -1,0 +1,51 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add multer
+
+PATH: 
+  C:\Python27;C:\Python27\Scripts;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Users\Fuel\AppData\Local\Programs\Python\Python38;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\OpenJDK\openjdk-8u292-b10\bin;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\Fuel\AppData\Local\Microsoft\WindowsApps;C:\Program Files\heroku\bin;C:\Program Files\JetBrains\PyCharm Community Edition 2019.3.2\bin;C:\Users\Fuel\AppData\Local\Programs\Python\Python38;C:\Program Files (x86)\FreeArc\bin;C:\Users\Fuel\AppData\Local\Yarn\bin;C:\Users\Fuel\AppData\Local\Android\Sdk;C:\Users\Fuel\AppData\Roaming\npm;C:\Users\Fuel\AppData\Local\Programs\Microsoft VS Code\bin
+
+Yarn version: 
+  1.22.5
+
+Node version: 
+  18.5.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: EPERM: operation not permitted, unlink 'F:\Mamun\project\Mamun\programming hero\4th btch\marine-students\marine-student-server\node_modules\bcrypt\lib\binding\napi-v3\bcrypt_lib.node'
+
+npm manifest: 
+  {
+    "name": "server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js",
+      "dev": "nodemon index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "bcrypt": "^5.1.0",
+      "cors": "^2.8.5",
+      "dotenv": "^16.0.3",
+      "express": "^4.18.2",
+      "jsonwebtoken": "^9.0.0",
+      "mysql2": "^2.3.3",
+      "nodemailer": "^6.8.0",
+      "sequelize": "^6.28.0"
+    },
+    "devDependencies": {
+      "nodemon": "^2.0.20"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

@@ -10,6 +10,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(cors());
 
 
+
 //external route
 app.use('/api/v1/auth', require('./routes/authRoute'));
 app.use('/api/v1/student', require('./routes/studentRoute'));

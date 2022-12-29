@@ -1,10 +1,14 @@
 const db = require("../model");
+const multer = require("multer");
 
 const Student = db.student;
 const Personal = db.personal_info;
 const Employment = db.employment_info;
 const Academic = db.academic_info;
 const Others = db.others_info;
+
+
+
 
 module.exports = {
   getAllStudent: async (req, res) => {
@@ -93,14 +97,43 @@ module.exports = {
   updateStudentDetails: async (req, res) => {
     const { id } = req.user;
     const result = await Personal.update(req.body, { where: { student: id } });
-    if(result[0]>0){
+    if (result[0] > 0) {
       res.status(201).json({
-        message: 'Updated Successfully'
-      })
-    }else{
+        message: "Updated Successfully",
+      });
+    } else {
       res.status(400).json({
-        message: 'Internal Server Error'
-      })
+        message: "Internal Server Error",
+      });
+    }
+  },
+  updateBasic: async (req, res) => {
+    const { id } = req.user;
+    const result = await Student.update(req.body, { where: { id: id } });
+    if (result[0] > 0) {
+      res.status(201).json({
+        message: "Updated Successfully",
+      });
+    } else {
+      res.status(400).json({
+        message: "Internal Server Error",
+      });
+    }
+  },
+  editPhoto: async (req, res) => {
+    const { id } = req.user;
+    if (!req.file) {
+      console.log("No file received");
+      return res.send({
+        success: false,
+      });
+    } else {
+      const host = req.host;
+      const filePath = req.protocol + "://" + host + "/" + req.file.path;
+      console.log("file received", filePath);
+      return res.send({
+        success: true,
+      });
     }
   },
 };
