@@ -1,5 +1,9 @@
 const db = require("../model");
+const { Op } = require('sequelize');
 const multer = require("multer");
+const fs = require('fs');
+const url = require('url');
+const path = require('path')
 
 const Student = db.student;
 const Personal = db.personal_info;
@@ -43,6 +47,44 @@ module.exports = {
       res.status(203).json({
         message: "No Student Found",
       });
+    }
+  },
+  getStudentsByName: async (req, res) => {
+    const name = req.params.name;
+    const students = await Student.findAll({
+      where: {
+        name: { [Op.like]: `%${name}%` }
+      },
+      attributes: { exclude: ["password", "role", "createdAt", "updatedAt"] },
+      include: [
+        {
+          model: Personal,
+          as: "personal_info", //same as models/index.js
+          attributes: { exclude: ["user"] },
+        },
+        {
+          model: Employment,
+          as: "employment_info", //same as models/index.js
+          attributes: { exclude: ["user"] },
+        },
+        {
+          model: Academic,
+          as: "academic_info", //same as models/index.js
+          attributes: { exclude: ["user"] },
+        },
+        {
+          model: Others,
+          as: "others_info", //same as models/index.js
+          attributes: { exclude: ["user"] },
+        },
+      ],
+    });
+    if(students.length>0){
+      res.status(200).json(students)
+    }else{
+      res.status(400).json({
+        message: 'Student Not Found'
+      })
     }
   },
   getStudentById: async (req, res) => {
@@ -128,12 +170,11 @@ module.exports = {
         success: false,
       });
     } else {
-      const host = req.host;
-      const filePath = req.protocol + "://" + host + "/" + req.file.path;
-      console.log("file received", filePath);
-      return res.send({
-        success: true,
-      });
+      const host = req.get('host');
+      const filePath = req.protocol + "://" + host + "/" + req.file.path.replace(/\\/g, "/");
+      const result = await Personal.update({ photo: filePath }, { where: { student: id } });
+      console.log(result)
+
     }
   },
 };
