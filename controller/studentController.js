@@ -53,7 +53,8 @@ module.exports = {
     const name = req.params.name;
     const students = await Student.findAll({
       where: {
-        name: { [Op.like]: `%${name}%` }
+        name: { [Op.like]: `%${name}%` },
+        status: 'active'
       },
       attributes: { exclude: ["password", "role", "createdAt", "updatedAt"] },
       include: [
