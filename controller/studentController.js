@@ -165,6 +165,7 @@ module.exports = {
   },
   editPhoto: async (req, res) => {
     const { id } = req.user;
+
     if (!req.file) {
       console.log("No file received");
       return res.send({
@@ -174,8 +175,15 @@ module.exports = {
       const host = req.get('host');
       const filePath = req.protocol + "://" + host + "/" + req.file.path.replace(/\\/g, "/");
       const result = await Personal.update({ photo: filePath }, { where: { student: id } });
-      console.log(result)
-
+      if(result[0]>0){
+        res.status(200).json({
+          message: 'Photo Uploaded Successfully'
+        })
+      }else{
+        res.status(500).json({
+          message: 'server error occurd'
+        })
+      }
     }
   },
 };
