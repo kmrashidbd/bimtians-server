@@ -1,8 +1,10 @@
 const db = require('../model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require("nodemailer");
 
 const Student = db.student;
+
 
 module.exports = {
     register: async (req, res) => {
@@ -75,7 +77,7 @@ module.exports = {
         const { email } = req.user;
         const student = await Student.findOne({
             where: { email: email },
-            attributes: ["id", "email", "name", "role", "status"] ,
+            attributes: ["id", "email", "name", "role", "status"],
         });
         res.status(200).json(student)
     },
@@ -104,5 +106,36 @@ module.exports = {
                 message: "Student Not Found",
             });
         };
-    }
+    },
+    forgotPassword: async (req, res) => {
+        const email = req.params.email;
+        const student = await Student.findOne({ where: { email: email } });
+        if (student !== null) {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'kazi299499@gmail.com',
+                    pass: 'kghjsgpkgygshrry'
+                }
+            });
+            const mailOptions = {
+                from: 'noreply@gmail.com',
+                to: email,
+                subject: 'Sending Email using Node.js',
+                text: 'That was easy!'
+            };
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                    res.send('working')
+                }
+            });
+        } else {
+            res.status(400).json({
+                message: 'Student Not Found'
+            })
+        }
+    },
 };

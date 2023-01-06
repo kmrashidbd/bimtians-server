@@ -39,7 +39,7 @@ const upload = multer({
 });
 
 router.get('/all', studentController.getAllStudent);
-router.get('/single/:name', studentController.getStudentsByName)
+router.get('/single/:name', studentController.getStudentsByName);
 router.post('/addPersonal', verifyToken, studentController.addStudentPersonalDetails);
 router.put('/editPersonal', verifyToken, studentController.updateStudentDetails);
 router.put('/editBasic', verifyToken, studentController.updateBasic);
