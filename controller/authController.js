@@ -2,6 +2,7 @@ const db = require('../model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
+const nodemailerMailgun = require('nodemailer-mailgun-transport');
 
 const Student = db.student;
 
@@ -111,25 +112,38 @@ module.exports = {
         const email = req.params.email;
         const student = await Student.findOne({ where: { email: email } });
         if (student !== null) {
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
+            const auth = {
                 auth: {
-                    user: 'kazi299499@gmail.com',
-                    pass: 'kghjsgpkgygshrry'
+                    api_key: '94135017511fbca2326ecd3f017f621b-8845d1b1-62e6e355',
+                    domain: 'sandboxf01a3a3f60d347449099a868da7be685.mailgun.org'
                 }
-            });
+            }
+            // const transporter = nodemailer.createTransport({
+            //     service: 'gmail',
+            //     auth: {
+            //         user: 'kazi299499@gmail.com',
+            //         pass: 'kghjsgpkgygshrry'
+            //     }
+            // });
+            const transporter = nodemailer.createTransport(nodemailerMailgun(auth))
             const mailOptions = {
-                from: 'noreply@gmail.com',
+                from: 'Exited User <noreply@example.mailgun.org>',
                 to: email,
-                subject: 'Sending Email using Node.js',
-                text: 'That was easy!'
+                subject: 'Sending Email using nodemailer mailgun Node.js',
+                text: 'That was easy!',
+                html: `
+                <p>For clients that do not support AMP4EMAIL or amp content is not valid</p><br>
+                <a href="http://localhost:3000/forgotPasss/${student?.id}/reset">Reset Password</a>
+                `
             };
             transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
                     console.log(error);
                 } else {
                     console.log('Email sent: ' + info.response);
-                    res.send('working')
+                    res.status(200).json({
+                        message: 'Email Sent on Registered Email'
+                    })
                 }
             });
         } else {
@@ -138,4 +152,22 @@ module.exports = {
             })
         }
     },
+    resetPassword: async (req, res) => {
+        const id = req.params.id;
+        const password = req.body.password;
+        bcrypt.hash(password, 11, (err, hash) => {
+            if (!err) {
+                Student.update({ password: hash }, { where: { id: id } })
+                    .then(result=>{
+                        console.log(result);
+                        res.status(200).json({
+                            message: "Password Reset Successfully",
+                        });
+                    })
+                    .catch(err=>console.log(err))                
+            }else{
+                console.log(err)
+            }
+        })
+    }
 };
