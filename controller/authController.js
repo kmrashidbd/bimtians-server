@@ -9,7 +9,7 @@ const Student = db.student;
 
 module.exports = {
     register: async (req, res) => {
-        const { name, email, password, gender, mobile } = req.body;
+        const { name, email, password, course, intake, gender, mobile } = req.body;
         const existingUser = await Student.findOne({ where: { email: email } });
         console.log(existingUser, name)
         if (existingUser === null) {
@@ -17,7 +17,7 @@ module.exports = {
                 if (err) {
                     console.log(err);
                 } else {
-                    const newUser = { name, email, password: hash, mobile, gender };
+                    const newUser = { name, email, password: hash, course, intake, mobile, gender };
                     Student.create(newUser)
                         .then((user) => {
                             res.status(201).json({
@@ -158,14 +158,14 @@ module.exports = {
         bcrypt.hash(password, 11, (err, hash) => {
             if (!err) {
                 Student.update({ password: hash }, { where: { id: id } })
-                    .then(result=>{
+                    .then(result => {
                         console.log(result);
                         res.status(200).json({
                             message: "Password Reset Successfully",
                         });
                     })
-                    .catch(err=>console.log(err))                
-            }else{
+                    .catch(err => console.log(err))
+            } else {
                 console.log(err)
             }
         })

@@ -28,7 +28,7 @@ db.sequelize = sequelize;
 
 db.student = require('./studentModel')(sequelize, DataTypes);
 db.personal_info = require('./personalModel')(sequelize, DataTypes);
-db.academic_info = require('./academicModel')(sequelize, DataTypes);
+// db.academic_info = require('./academicModel')(sequelize, DataTypes);
 db.employment_info = require('./employmentModel')(sequelize, DataTypes);
 db.others_info = require('./othersModel')(sequelize, DataTypes);
 
@@ -39,23 +39,19 @@ db.sequelize.sync({ force: false })
 
 // user connection with varius model
 db.student.hasOne(db.personal_info, {
-  foreignKey: 'student',
+  foreignKey: 'studentId',
   as: 'personal_info'
 })
 
-db.student.hasOne(db.academic_info, {
-  foreignKey: 'student',
-  as: 'academic_info'
-})
-
 db.student.hasOne(db.employment_info, {
-  foreignKey: 'student',
+  foreignKey: 'studentId',
   as: 'employment_info'
 })
 
 db.student.hasOne(db.others_info, {
-  foreignKey: 'student',
+  foreignKey: 'studentId',
   as: 'others_info'
 })
+
 
 module.exports = db;

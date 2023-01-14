@@ -8,10 +8,7 @@ const path = require('path')
 const Student = db.student;
 const Personal = db.personal_info;
 const Employment = db.employment_info;
-const Academic = db.academic_info;
 const Others = db.others_info;
-
-
 
 
 module.exports = {
@@ -22,22 +19,17 @@ module.exports = {
         {
           model: Personal,
           as: "personal_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["studentId"] },
         },
         {
           model: Employment,
           as: "employment_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
-        },
-        {
-          model: Academic,
-          as: "academic_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["studentId"] },
         },
         {
           model: Others,
           as: "others_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["studentId"] },
         },
       ],
     });
@@ -50,7 +42,7 @@ module.exports = {
     }
   },
   getStudentsByName: async (req, res) => {
-    const name = req.params.name;
+    const {name, intake, course} = req.body;
     const students = await Student.findAll({
       where: {
         name: { [Op.like]: `%${name}%` },
@@ -61,22 +53,17 @@ module.exports = {
         {
           model: Personal,
           as: "personal_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["studentId"] },
         },
         {
           model: Employment,
           as: "employment_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
-        },
-        {
-          model: Academic,
-          as: "academic_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["studentId"] },
         },
         {
           model: Others,
           as: "others_info", //same as models/index.js
-          attributes: { exclude: ["user"] },
+          attributes: { exclude: ["studentId"] },
         },
       ],
     });
@@ -97,22 +84,17 @@ module.exports = {
         {
           model: Personal,
           as: "personal_info", //same as models/index.js
-          attributes: { exclude: ["id", "student"] },
+          attributes: { exclude: ["id", "studentId"] },
         },
         {
           model: Employment,
           as: "employment_info", //same as models/index.js
-          attributes: { exclude: ["id", "student"] },
-        },
-        {
-          model: Academic,
-          as: "academic_info", //same as models/index.js
-          attributes: { exclude: ["id", "student"] },
+          attributes: { exclude: ["id", "studentId"] },
         },
         {
           model: Others,
           as: "others_info", //same as models/index.js
-          attributes: { exclude: ["id", "student"] },
+          attributes: { exclude: ["id", "studentId"] },
         },
       ],
     });
@@ -125,9 +107,9 @@ module.exports = {
     }
   },
   addStudentPersonalDetails: async (req, res) => {
-    const student = req.user.id;
-    const newStudentDetails = { student, ...req.body };
-    const registerd = await Personal.findOne({ where: { student: student } });
+    const studentId = req.user.id;
+    const newStudentDetails = { studentId, ...req.body };
+    const registerd = await Personal.findOne({ where: { studentId: studentId } });
     if (registerd !== null) {
       return res.status(400).json({
         message: "Personal Details Already Added",
@@ -139,7 +121,7 @@ module.exports = {
   },
   updateStudentDetails: async (req, res) => {
     const { id } = req.user;
-    const result = await Personal.update(req.body, { where: { student: id } });
+    const result = await Personal.update(req.body, { where: { studentId: id } });
     if (result[0] > 0) {
       res.status(201).json({
         message: "Updated Successfully",
@@ -152,6 +134,7 @@ module.exports = {
   },
   updateBasic: async (req, res) => {
     const { id } = req.user;
+    console.log(req.body)
     const result = await Student.update(req.body, { where: { id: id } });
     if (result[0] > 0) {
       res.status(201).json({
@@ -174,7 +157,7 @@ module.exports = {
     } else {
       const host = req.get('host');
       const filePath = req.protocol + "://" + host + "/" + req.file.path.replace(/\\/g, "/");
-      const result = await Personal.update({ photo: filePath }, { where: { student: id } });
+      const result = await Personal.update({ photo: filePath }, { where: { studentId: id } });
       if(result[0]>0){
         res.status(200).json({
           message: 'Photo Uploaded Successfully'
