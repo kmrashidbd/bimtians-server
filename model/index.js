@@ -43,7 +43,7 @@ db.student.hasOne(db.personal_info, {
   as: 'personal_info'
 })
 
-db.student.hasOne(db.employment_info, {
+db.student.hasMany(db.employment_info, {
   foreignKey: 'studentId',
   as: 'employment_info'
 })

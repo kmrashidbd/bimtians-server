@@ -23,7 +23,7 @@ module.exports = {
   editEmployment: async (req, res) => {
     const { id } = req.user;
     const result = await Employment.update(req.body, {
-      where: { student: id },
+      where: { studentId: id },
     });
     if (result[0] > 0) {
       res.status(201).json({
