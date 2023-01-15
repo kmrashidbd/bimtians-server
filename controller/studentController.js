@@ -89,7 +89,7 @@ module.exports = {
         {
           model: Employment,
           as: "employment_info", //same as models/index.js
-          attributes: { exclude: ["id", "studentId"] },
+          attributes: { exclude: ["studentId"] },
         },
         {
           model: Others,

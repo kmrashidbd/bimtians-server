@@ -28,7 +28,10 @@ module.exports = (sequelize, DataTypes) => {
         },   
         joiningYear: {
             type: DataTypes.STRING,
-        }     
+        },   
+        jobEnd : {
+            type: DataTypes.STRING,
+        }   
     }, {
         timestamps: false
       });

@@ -10,20 +10,13 @@ module.exports = {
       studentId: student.id,
       ...req.body,
     };
-    const exists = await Employment.findOne({ where: { studentId: student.id } });
-    if (exists !== null) {
-      return res.status(400).json({
-        message: "Employment Details Already Added",
-      });
-    } else {
-      const details = await Employment.create(employemnt);
-      res.status(201).json(details);
-    }
+    const details = await Employment.create(employemnt);
+    res.status(201).json(details);
   },
   editEmployment: async (req, res) => {
-    const { id } = req.user;
+    const { id } = req.params;
     const result = await Employment.update(req.body, {
-      where: { studentId: id },
+      where: { id: id },
     });
     if (result[0] > 0) {
       res.status(201).json({
@@ -33,6 +26,19 @@ module.exports = {
       res.status(400).json({
         message: "Internal Server Error",
       });
+    }
+  },
+  deleteEmployment: async (req, res) => {
+    const { id } = req.params;
+    const result = await Employment.destroy({ where: { id: id } });
+    if (result > 0) {
+      return res.status(200).json({
+        message: 'Successfully Deleted'
+      })
+    } else {
+      res.status(400).json({
+        message: 'Not Found'
+      })
     }
   },
   addOthers: async (req, res) => {
