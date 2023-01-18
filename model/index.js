@@ -31,6 +31,7 @@ db.personal_info = require('./personalModel')(sequelize, DataTypes);
 // db.academic_info = require('./academicModel')(sequelize, DataTypes);
 db.employment_info = require('./employmentModel')(sequelize, DataTypes);
 db.others_info = require('./othersModel')(sequelize, DataTypes);
+db.contact_request = require('./contactRequestModel')(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false })
   .then(() => {

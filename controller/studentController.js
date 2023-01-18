@@ -1,9 +1,5 @@
 const db = require("../model");
 const { Op } = require('sequelize');
-const multer = require("multer");
-const fs = require('fs');
-const url = require('url');
-const path = require('path')
 
 const Student = db.student;
 const Personal = db.personal_info;
@@ -42,12 +38,22 @@ module.exports = {
     }
   },
   getStudentsByName: async (req, res) => {
-    const {name, intake, course} = req.body;
-    const students = await Student.findAll({
-      where: {
+    const { name, intake, course } = req.body;
+    let filters;
+    if (!intake) {
+      filters = {
         name: { [Op.like]: `%${name}%` },
         status: 'active'
-      },
+      }
+    } else {
+      filters = {
+        course,
+        intake,
+        status: 'active'
+      }
+    }
+    const students = await Student.findAll({
+      where: filters,
       attributes: { exclude: ["password", "role", "createdAt", "updatedAt"] },
       include: [
         {
@@ -67,9 +73,9 @@ module.exports = {
         },
       ],
     });
-    if(students.length>0){
+    if (students.length > 0) {
       res.status(200).json(students)
-    }else{
+    } else {
       res.status(400).json({
         message: 'Student Not Found'
       })
@@ -158,11 +164,11 @@ module.exports = {
       const host = req.get('host');
       const filePath = req.protocol + "://" + host + "/" + req.file.path.replace(/\\/g, "/");
       const result = await Personal.update({ photo: filePath }, { where: { studentId: id } });
-      if(result[0]>0){
+      if (result[0] > 0) {
         res.status(200).json({
           message: 'Photo Uploaded Successfully'
         })
-      }else{
+      } else {
         res.status(500).json({
           message: 'server error occurd'
         })

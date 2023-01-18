@@ -2,6 +2,7 @@ const db = require("../model");
 
 const Employment = db.employment_info;
 const Others = db.others_info;
+const ContactRequest = db.contact_request;
 
 module.exports = {
   addEmployment: async (req, res) => {
@@ -72,4 +73,50 @@ module.exports = {
       });
     }
   },
+  createContactRequest: async (req, res) => {
+    const id = req.user.id;
+    const exists = await ContactRequest.findOne({
+      where: {
+        requester: id,
+        requestedUser: req.params.id
+      }
+    });
+    if (exists !== null) {
+      return res.status(400).json({
+        message: 'Request Already Sent'
+      })
+    } else {
+      const newRequest = await ContactRequest.create({
+        requester: id,
+        requestedUser: req.params.id
+      });
+      console.log(newRequest)
+      res.status(200).json({
+        message: 'Request Successfully Sent',
+      })
+    }
+  },
+  getSingleContactRequest: async (req, res) => {
+    const id = req.user.id;
+    const requestDetails = await ContactRequest.findOne({
+      where: {
+        requester: id,
+        requestedUser: req.params.id
+      }
+    })
+    console.log(requestDetails)
+  },
+  getAllContactRequest: async (req, res) => {
+    const requests = await ContactRequest.findAll();
+    if (requests.length > 0) {
+      res.status(200).json(requests)
+    } else {
+      res.status(400).json({
+        message: 'No Request Found'
+      })
+    }
+  },
+  editContactRequest: async (req, res) => {
+
+  }
 };
