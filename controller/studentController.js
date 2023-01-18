@@ -5,6 +5,7 @@ const Student = db.student;
 const Personal = db.personal_info;
 const Employment = db.employment_info;
 const Others = db.others_info;
+const ContactRequest = db.contact_request;
 
 
 module.exports = {
@@ -101,6 +102,11 @@ module.exports = {
           model: Others,
           as: "others_info", //same as models/index.js
           attributes: { exclude: ["id", "studentId"] },
+        },
+        {
+          model: ContactRequest,
+          as: "contract_request", //same as models/index.js
+          // attributes: { exclude: ["studentId"] },
         },
       ],
     });

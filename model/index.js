@@ -54,5 +54,10 @@ db.student.hasOne(db.others_info, {
   as: 'others_info'
 })
 
+db.student.hasMany(db.contact_request, {
+  foreignKey: 'requestedUser',
+  as: 'contract_request'
+})
+
 
 module.exports = db;
