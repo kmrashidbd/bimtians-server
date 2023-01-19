@@ -105,7 +105,7 @@ module.exports = {
         },
         {
           model: ContactRequest,
-          as: "contract_request", //same as models/index.js
+          as: "contact_request", //same as models/index.js
           // attributes: { exclude: ["studentId"] },
         },
       ],

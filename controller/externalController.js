@@ -1,5 +1,6 @@
 const db = require("../model");
 
+const Student = db.student;
 const Employment = db.employment_info;
 const Others = db.others_info;
 const ContactRequest = db.contact_request;
@@ -77,8 +78,8 @@ module.exports = {
     const id = req.user.id;
     const exists = await ContactRequest.findOne({
       where: {
-        requester: id,
-        requestedUser: req.params.id
+        requestBy : id,
+        requestedTo : req.params.id
       }
     });
     if (exists !== null) {
@@ -87,8 +88,8 @@ module.exports = {
       })
     } else {
       const newRequest = await ContactRequest.create({
-        requester: id,
-        requestedUser: req.params.id
+        requestBy : id,
+        requestedTo : req.params.id
       });
       console.log(newRequest)
       res.status(200).json({
@@ -96,18 +97,39 @@ module.exports = {
       })
     }
   },
-  getSingleContactRequest: async (req, res) => {
+  getSingleUserContactRequest: async (req, res) => {
     const id = req.user.id;
-    const requestDetails = await ContactRequest.findOne({
+    const requests = await ContactRequest.findAll({
       where: {
-        requester: id,
-        requestedUser: req.params.id
-      }
+        requestedTo: id
+      },
+      include: [
+        {
+          model: Student,
+          as: "student",
+          attributes: ['name', 'course', 'intake'],
+        },
+      ],
+      attributes: { exclude: ["requestBy", "requestedTo"] },
     })
-    console.log(requestDetails)
+    res.status(200).json(requests)
   },
   getAllContactRequest: async (req, res) => {
-    const requests = await ContactRequest.findAll();
+    const requests = await ContactRequest.findAll({
+      include: [
+        {
+          model: Student,
+          as: "student",
+          attributes: ['id','name'],
+        },
+        {
+          model: Student,
+          as: "requested_user",
+          attributes: ['id','name'],
+        },
+      ],
+      attributes: { exclude: ["requestBy", "requestedTo"] },
+    });
     if (requests.length > 0) {
       res.status(200).json(requests)
     } else {
@@ -117,6 +139,17 @@ module.exports = {
     }
   },
   editContactRequest: async (req, res) => {
-
+    const result = await ContactRequest.update(req.body, {
+      where: {id: req.params.id}
+    });
+    if(result[0]>0){
+      res.status(200).json({
+        message: 'Permission Changed Successfully'
+      })
+    }else{
+      res.status(500).json({
+        message: 'Internal Server Error'
+      })
+    }
   }
 };

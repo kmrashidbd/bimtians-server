@@ -55,8 +55,18 @@ db.student.hasOne(db.others_info, {
 })
 
 db.student.hasMany(db.contact_request, {
-  foreignKey: 'requestedUser',
-  as: 'contract_request'
+  foreignKey: 'requestedTo',
+  as: 'contact_request'
+})
+
+db.contact_request.belongsTo(db.student, {
+  foreignKey: 'requestBy',
+  as: 'student'
+})
+
+db.contact_request.belongsTo(db.student, {
+  foreignKey: 'requestedTo',
+  as: 'requested_user'
 })
 
 
