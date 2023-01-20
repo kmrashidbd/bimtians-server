@@ -69,5 +69,10 @@ db.contact_request.belongsTo(db.student, {
   as: 'requested_user'
 })
 
+db.employment_info.belongsTo(db.student,{
+  foreignKey: 'studentId',
+  as: 'student'
+})
+
 
 module.exports = db;

@@ -82,6 +82,23 @@ module.exports = {
       })
     }
   },
+  getStudentByEmployment: async(req, res)=>{
+    const company = req.params.name;
+    const result = await Employment.findAll({
+      where: {
+        companyName: company
+      },
+      include:[
+        {
+          model: Student,
+          as: "student",
+          attributes: ["id", "name"],
+        }
+      ],
+      attributes: { exclude: ["id","studentId"] }
+    })
+    res.send(result)
+  },
   getStudentById: async (req, res) => {
     const id = req.params.id;
     const student = await Student.findOne({
