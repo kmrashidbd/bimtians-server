@@ -2,7 +2,6 @@ const db = require('../model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
-const nodemailerMailgun = require('nodemailer-mailgun-transport');
 
 const Student = db.student;
 
@@ -112,22 +111,16 @@ module.exports = {
         const email = req.params.email;
         const student = await Student.findOne({ where: { email: email } });
         if (student !== null) {
-            const auth = {
+            const transporter = nodemailer.createTransport({
+                host: process.env.EMAIL_HOST,
+                port: process.env.EMAIL_PORT,
                 auth: {
-                    api_key: '94135017511fbca2326ecd3f017f621b-8845d1b1-62e6e355',
-                    domain: 'sandboxf01a3a3f60d347449099a868da7be685.mailgun.org'
+                    user: process.env.EMAIL_USERNAME,
+                    pass: process.env.EMAIL_PASS
                 }
-            }
-            // const transporter = nodemailer.createTransport({
-            //     service: 'gmail',
-            //     auth: {
-            //         user: 'kazi299499@gmail.com',
-            //         pass: 'kghjsgpkgygshrry'
-            //     }
-            // });
-            const transporter = nodemailer.createTransport(nodemailerMailgun(auth))
+            });
             const mailOptions = {
-                from: 'Exited User <noreply@example.mailgun.org>',
+                from: 'BIMTIAN <noreply@bimtian.org>',
                 to: email,
                 subject: 'Sending Email using nodemailer mailgun Node.js',
                 text: 'That was easy!',
