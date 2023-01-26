@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         permission: {
             type: DataTypes.STRING,
-            defaultValue: 'no'
+            defaultValue: 'yes'
         }
     });
 

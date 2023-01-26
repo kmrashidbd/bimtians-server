@@ -18,9 +18,6 @@ module.exports = (sequelize, DataTypes) => {
         mother: {
             type: DataTypes.STRING,
         },
-        religion: {
-            type: DataTypes.STRING,
-        },
         nId: {
             type: DataTypes.STRING,
             defaultValue: "user",
@@ -40,10 +37,22 @@ module.exports = (sequelize, DataTypes) => {
         linkedIn: {
             type: DataTypes.STRING
         },
-        presentAddress: {
+        presentRoad: {
             type: DataTypes.UUID
         },
-        permanentAddress: {
+        presentDistrict: {
+            type: DataTypes.UUID
+        },
+        presentCountry: {
+            type: DataTypes.UUID
+        },
+        permanentRoad: {
+            type: DataTypes.STRING,
+        },
+        permanentDistrict: {
+            type: DataTypes.STRING,
+        },
+        permanentCountry: {
             type: DataTypes.STRING,
         },
         employmentStatus: {
