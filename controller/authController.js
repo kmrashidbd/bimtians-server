@@ -8,15 +8,14 @@ const Student = db.student;
 
 module.exports = {
     register: async (req, res) => {
-        const { name, email, password, course, intake, gender, mobile } = req.body;
+        const { name, email, password, course, intake, gender, mobile, academicStatus, passingYear } = req.body;
         const existingUser = await Student.findOne({ where: { email: email } });
-        console.log(existingUser, name)
         if (existingUser === null) {
             return bcrypt.hash(password, 11, (err, hash) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    const newUser = { name, email, password: hash, course, intake, mobile, gender };
+                    const newUser = { name, email, password: hash, course, intake, mobile, gender, academicStatus, passingYear };
                     Student.create(newUser)
                         .then((user) => {
                             res.status(201).json({
@@ -42,6 +41,7 @@ module.exports = {
     },
     login: async (req, res) => {
         const { email, password } = req.body;
+        console.log(req.body)
         const student = await Student.findOne({ where: { email: email } });
         if (student === null) {
             res.status(404).json({
@@ -49,6 +49,7 @@ module.exports = {
             });
         } else {
             bcrypt.compare(password, student.password, (err, result) => {
+                console.log(err, result)
                 if (err) {
                     console.log(err);
                 } else {
@@ -107,6 +108,44 @@ module.exports = {
             });
         };
     },
+    changePassword: async (req, res) => {
+        const { id } = req.user;
+        const { currentPassword, newPassword } = req.body;
+        try {
+            const existingUser = await Student.findOne({ id: id });
+            bcrypt.compare(currentPassword, existingUser.password, (err, result) => {
+                if (err) {
+                    console.log(err)
+                    return res.status(400).json({
+                        message: 'Server Side Error'
+                    })
+                } else {
+                    if (!result) {
+                        return res.status(400).json({
+                            message: 'Current Passsword Not Matched!'
+                        })
+                    }else{
+                        bcrypt.hash(newPassword, 11, (err, hash) => {
+                            if (!err) {
+                                Student.update({ password: hash }, { where: { id: id } })
+                                    .then(result => {
+                                        console.log(result);
+                                        res.status(200).json({
+                                            message: "Password change Successfully",
+                                        });
+                                    })
+                                    .catch(err => console.log(err))
+                            } else {
+                                console.log(err)
+                            }
+                        })
+                    }
+                }
+            })
+        } catch (err) {
+            console.log(err)
+        }
+    },
     forgotPassword: async (req, res) => {
         const email = req.params.email;
         const student = await Student.findOne({ where: { email: email } });
@@ -122,11 +161,11 @@ module.exports = {
             const mailOptions = {
                 from: 'BIMTIAN <noreply@bimtian.org>',
                 to: email,
-                subject: 'Sending Email using nodemailer mailgun Node.js',
+                subject: 'Password Reset Request',
                 text: 'That was easy!',
                 html: `
-                <p>For clients that do not support AMP4EMAIL or amp content is not valid</p><br>
-                <a href="http://localhost:3000/forgotPasss/${student?.id}/reset">Reset Password</a>
+                <p>Please Visit on below Link to Change Password</p><br>
+                <a href="http://localhost:3000/forgotPasss/${student.id}/reset">Reset Password</a>
                 `
             };
             transporter.sendMail(mailOptions, function (error, info) {

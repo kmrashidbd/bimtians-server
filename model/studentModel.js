@@ -24,6 +24,9 @@ module.exports = (sequelize, DataTypes) => {
     intake: {
       type: DataTypes.STRING,
     },
+    photo:{
+        type: DataTypes.STRING,
+    },
     gender: {
       type: DataTypes.STRING,
     },
@@ -42,6 +45,10 @@ module.exports = (sequelize, DataTypes) => {
     passingYear: {
       type: DataTypes.STRING,
       defaultValue: 0,
+    },
+    shareContact: {
+      type: DataTypes.STRING,
+      defaultValue: "yes",
     }
   });
   return Student;

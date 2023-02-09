@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
         },   
         jobEnd : {
-            type: DataTypes.STRING,
+            type: DataTypes.NUMBER,
         }   
     }, {
         timestamps: false

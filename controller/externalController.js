@@ -1,9 +1,7 @@
 const db = require("../model");
 
-const Student = db.student;
 const Employment = db.employment_info;
 const Others = db.others_info;
-const ContactRequest = db.contact_request;
 
 module.exports = {
   addEmployment: async (req, res) => {
@@ -74,82 +72,4 @@ module.exports = {
       });
     }
   },
-  createContactRequest: async (req, res) => {
-    const id = req.user.id;
-    const exists = await ContactRequest.findOne({
-      where: {
-        requestBy : id,
-        requestedTo : req.params.id
-      }
-    });
-    if (exists !== null) {
-      return res.status(400).json({
-        message: 'Request Already Sent'
-      })
-    } else {
-      const newRequest = await ContactRequest.create({
-        requestBy : id,
-        requestedTo : req.params.id
-      });
-      console.log(newRequest)
-      res.status(200).json({
-        message: 'Request Successfully Sent',
-      })
-    }
-  },
-  getSingleUserContactRequest: async (req, res) => {
-    const id = req.user.id;
-    const requests = await ContactRequest.findAll({
-      where: {
-        requestedTo: id
-      },
-      include: [
-        {
-          model: Student,
-          as: "student",
-          attributes: ['name', 'course', 'intake'],
-        },
-      ],
-      attributes: { exclude: ["requestBy", "requestedTo"] },
-    })
-    res.status(200).json(requests)
-  },
-  getAllContactRequest: async (req, res) => {
-    const requests = await ContactRequest.findAll({
-      include: [
-        {
-          model: Student,
-          as: "student",
-          attributes: ['id','name'],
-        },
-        {
-          model: Student,
-          as: "requested_user",
-          attributes: ['id','name'],
-        },
-      ],
-      attributes: { exclude: ["requestBy", "requestedTo"] },
-    });
-    if (requests.length > 0) {
-      res.status(200).json(requests)
-    } else {
-      res.status(400).json({
-        message: 'No Request Found'
-      })
-    }
-  },
-  editContactRequest: async (req, res) => {
-    const result = await ContactRequest.update(req.body, {
-      where: {id: req.params.id}
-    });
-    if(result[0]>0){
-      res.status(200).json({
-        message: 'Permission Changed Successfully'
-      })
-    }else{
-      res.status(500).json({
-        message: 'Internal Server Error'
-      })
-    }
-  }
 };

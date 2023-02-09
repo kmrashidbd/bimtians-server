@@ -120,11 +120,6 @@ module.exports = {
           as: "others_info", //same as models/index.js
           attributes: { exclude: ["id", "studentId"] },
         },
-        {
-          model: ContactRequest,
-          as: "contact_request", //same as models/index.js
-          // attributes: { exclude: ["studentId"] },
-        },
       ],
     });
     if (student !== null) {
@@ -163,7 +158,6 @@ module.exports = {
   },
   updateBasic: async (req, res) => {
     const { id } = req.user;
-    console.log(req.body)
     const result = await Student.update(req.body, { where: { id: id } });
     if (result[0] > 0) {
       res.status(201).json({
@@ -177,7 +171,6 @@ module.exports = {
   },
   editPhoto: async (req, res) => {
     const { id } = req.user;
-
     if (!req.file) {
       console.log("No file received");
       return res.send({
@@ -186,7 +179,7 @@ module.exports = {
     } else {
       const host = req.get('host');
       const filePath = req.protocol + "://" + host + "/" + req.file.path.replace(/\\/g, "/");
-      const result = await Personal.update({ photo: filePath }, { where: { studentId: id } });
+      const result = await Student.update({ photo: filePath }, { where: { id: id } });
       if (result[0] > 0) {
         res.status(200).json({
           message: 'Photo Uploaded Successfully'

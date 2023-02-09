@@ -7,7 +7,16 @@ const port = process.env.PORT || 4000;
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:3000',
+        "http://bimtian.org"
+      ],
+      optionsSuccessStatus: 200,
+      credentials: true,
+      methods: ['GET,PUT,POST,DELETE,UPDATE,OPTIONS'],
+      exposedHeaders: ['set-cookie'],
+}));
 
 app.use('/assets/',express.static('assets')); 
 

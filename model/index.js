@@ -28,10 +28,8 @@ db.sequelize = sequelize;
 
 db.student = require('./studentModel')(sequelize, DataTypes);
 db.personal_info = require('./personalModel')(sequelize, DataTypes);
-// db.academic_info = require('./academicModel')(sequelize, DataTypes);
 db.employment_info = require('./employmentModel')(sequelize, DataTypes);
 db.others_info = require('./othersModel')(sequelize, DataTypes);
-db.contact_request = require('./contactRequestModel')(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false })
   .then(() => {
@@ -52,21 +50,6 @@ db.student.hasMany(db.employment_info, {
 db.student.hasOne(db.others_info, {
   foreignKey: 'studentId',
   as: 'others_info'
-})
-
-db.student.hasMany(db.contact_request, {
-  foreignKey: 'requestedTo',
-  as: 'contact_request'
-})
-
-db.contact_request.belongsTo(db.student, {
-  foreignKey: 'requestBy',
-  as: 'student'
-})
-
-db.contact_request.belongsTo(db.student, {
-  foreignKey: 'requestedTo',
-  as: 'requested_user'
 })
 
 db.employment_info.belongsTo(db.student,{

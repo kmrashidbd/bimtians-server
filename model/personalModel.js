@@ -8,9 +8,6 @@ module.exports = (sequelize, DataTypes) => {
         studentId: {
             type: DataTypes.UUID
         },
-        photo:{
-            type: DataTypes.STRING,
-        },
         father: {
             type: DataTypes.STRING,
             allowNull: false,
