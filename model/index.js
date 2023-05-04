@@ -28,8 +28,10 @@ db.sequelize = sequelize;
 
 db.student = require('./studentModel')(sequelize, DataTypes);
 db.personal_info = require('./personalModel')(sequelize, DataTypes);
-db.employment_info = require('./employmentModel')(sequelize, DataTypes);
 db.others_info = require('./othersModel')(sequelize, DataTypes);
+db.academic_info = require('./academicInfoModel')(sequelize, DataTypes);
+db.employment_info = require('./employmentModel')(sequelize, DataTypes);
+db.chat = require('./chatModel')(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false })
   .then(() => {
@@ -47,12 +49,22 @@ db.student.hasMany(db.employment_info, {
   as: 'employment_info'
 })
 
-db.student.hasOne(db.others_info, {
+db.student.hasMany(db.academic_info, {
+  foreignKey: 'studentId',
+  as: 'academic_info'
+})
+
+db.student.hasMany(db.others_info, {
   foreignKey: 'studentId',
   as: 'others_info'
 })
 
 db.employment_info.belongsTo(db.student,{
+  foreignKey: 'studentId',
+  as: 'student'
+})
+
+db.academic_info.belongsTo(db.student,{
   foreignKey: 'studentId',
   as: 'student'
 })

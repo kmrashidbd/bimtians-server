@@ -5,11 +5,12 @@ const Student = db.student;
 const Personal = db.personal_info;
 const Employment = db.employment_info;
 const Others = db.others_info;
-const ContactRequest = db.contact_request;
+const AcademicInfo = db.academic_info;
 
 
 module.exports = {
   getAllStudent: async (req, res) => {
+    const count = await Student.count();
     const students = await Student.findAll({
       attributes: { exclude: ["password", "createdAt", "updatedAt"] },
       include: [
@@ -28,51 +29,56 @@ module.exports = {
           as: "others_info", //same as models/index.js
           attributes: { exclude: ["studentId"] },
         },
+        {
+          model: AcademicInfo,
+          as: "academic_info", //same as models/index.js
+          attributes: { exclude: ["studentId"] },
+        },
       ],
     });
     if (students.length > 0) {
-      res.status(200).json(students);
+      res.status(200).json({ students, total: count });
     } else {
       res.status(203).json({
         message: "No Student Found",
       });
     }
   },
-  getStudentsByName: async (req, res) => {
+  searchStudent: async (req, res) => {
     const { name, intake, course } = req.body;
     let filters;
-    if (!intake) {
+    if (!intake && !course) {
       filters = {
-        name: { [Op.like]: `%${name}%` },
-        status: 'active'
+        studentName: { [Op.like]: `%${name}%` }
+      }
+    } else if (!name && !intake) {
+      filters = { course: course }
+    } else if (!name) {
+      filters = {
+        [Op.and]: [
+          { course: course },
+          { intake: intake }
+        ],
       }
     } else {
       filters = {
-        course,
-        intake,
-        status: 'active'
+        studentName: { [Op.like]: `%${name}%` },
+        [Op.or]: [
+          { course: course },
+          { intake: intake }
+        ],
       }
     }
-    const students = await Student.findAll({
+    const students = await AcademicInfo.findAll({
       where: filters,
-      attributes: { exclude: ["password", "role", "createdAt", "updatedAt"] },
       include: [
         {
-          model: Personal,
-          as: "personal_info", //same as models/index.js
-          attributes: { exclude: ["studentId"] },
-        },
-        {
-          model: Employment,
-          as: "employment_info", //same as models/index.js
-          attributes: { exclude: ["studentId"] },
-        },
-        {
-          model: Others,
-          as: "others_info", //same as models/index.js
-          attributes: { exclude: ["studentId"] },
+          model: Student,
+          as: "student", //same as models/index.js
+          attributes: ['name', 'email', 'photo', 'gender', 'status', 'id'],
         },
       ],
+      attributes: { exclude: ["studentId"] },
     });
     if (students.length > 0) {
       res.status(200).json(students)
@@ -82,20 +88,20 @@ module.exports = {
       })
     }
   },
-  getStudentByEmployment: async(req, res)=>{
+  getStudentByEmployment: async (req, res) => {
     const company = req.params.name;
     const result = await Employment.findAll({
       where: {
         companyName: company
       },
-      include:[
+      include: [
         {
           model: Student,
           as: "student",
           attributes: ["id", "name"],
         }
       ],
-      attributes: { exclude: ["id","studentId"] }
+      attributes: { exclude: ["id", "studentId"] }
     })
     res.send(result)
   },
@@ -118,7 +124,12 @@ module.exports = {
         {
           model: Others,
           as: "others_info", //same as models/index.js
-          attributes: { exclude: ["id", "studentId"] },
+          attributes: { exclude: ["studentId"] },
+        },
+        {
+          model: AcademicInfo,
+          as: "academic_info", //same as models/index.js
+          attributes: { exclude: ["studentId"] },
         },
       ],
     });

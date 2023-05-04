@@ -9,6 +9,8 @@ router.get('/loggedIn', verifyToken, authController.loggedInStudent);
 router.put('/changePassword', verifyToken, authController.changePassword);
 router.post('/forgotPassword/:email', authController.forgotPassword);
 router.put('/resetPassword/:id', authController.resetPassword);
-router.put('/:id', verifyToken, verifyAdmin, authController.updateById)
+router.route('/:id')
+    .put(verifyToken, verifyAdmin, authController.updateById)
+    .delete(verifyToken, verifyAdmin, authController.deleteById)
 
 module.exports = router;

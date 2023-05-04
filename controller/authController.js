@@ -4,7 +4,17 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
 
 const Student = db.student;
+const AcademicInfo = db.academic_info;
 
+const deleteExists = async (id, dbName) => {
+    const exists = await dbName.findOne({ where: { studentId: id } });
+    if (exists) {
+        const deleted = await dbName.destroy({ where: { studentId: id } })
+        return deleted;
+    } else {
+        return 'Not Found'
+    }
+}
 
 module.exports = {
     register: async (req, res) => {
@@ -15,9 +25,17 @@ module.exports = {
                 if (err) {
                     console.log(err);
                 } else {
-                    const newUser = { name, email, password: hash, course, intake, mobile, gender, academicStatus, passingYear };
+                    const newUser = {  name, email, password: hash, mobile, gender, course, intake, academicStatus, passingYear };
                     Student.create(newUser)
                         .then((user) => {
+                            AcademicInfo.create({
+                                studentId: user.id,
+                                studentName: name,
+                                course,
+                                intake,
+                                status: academicStatus,
+                                passingYear
+                            })
                             res.status(201).json({
                                 message: "student created successfully",
                                 student: {
@@ -41,7 +59,6 @@ module.exports = {
     },
     login: async (req, res) => {
         const { email, password } = req.body;
-        console.log(req.body)
         const student = await Student.findOne({ where: { email: email } });
         if (student === null) {
             res.status(404).json({
@@ -49,7 +66,6 @@ module.exports = {
             });
         } else {
             bcrypt.compare(password, student.password, (err, result) => {
-                console.log(err, result)
                 if (err) {
                     console.log(err);
                 } else {
@@ -58,13 +74,24 @@ module.exports = {
                             message: "Password Not Matched",
                         });
                     } else {
+                        if (!student.numericId) {
+                            let numericId = [];
+                            (async function () {
+                                const numeric = await Student.findAll({
+                                    attributes: ["numericId"],
+                                })
+                                numeric.map(nu => nu.numericId > 1000 && numericId.push(nu.numericId));
+                                await Student.update({ numericId: Math.max(...numericId) + 1 }, {
+                                    where: { email: email },
+                                });
+                            })();
+                        }
                         const userData = {
                             id: student.id,
                             email: student.email,
+                            name: student.name
                         };
-                        const token = jwt.sign(userData, process.env.SECRET, {
-                            expiresIn: "1d",
-                        });
+                        const token = jwt.sign(userData, process.env.SECRET);
                         res.status(200).json({
                             message: "Login Successfully",
                             token,
@@ -84,6 +111,7 @@ module.exports = {
     },
     updateById: async (req, res) => {
         const id = req.params.id;
+        console.log(req.body)
         const updatedStudent = await Student.update(req.body, { where: { id: id } });
         if (updatedStudent[0] > 0) {
             res.status(200).json({
@@ -99,6 +127,10 @@ module.exports = {
         const id = req.params.id;
         const deletedStudent = await Student.destroy({ where: { id: id } });
         if (deletedStudent > 0) {
+            deleteExists(id, db.academic_info);
+            deleteExists(id, db.employment_info);
+            deleteExists(id, db.others_info);
+            deleteExists(id, db.personal_info);
             res.status(200).json({
                 message: "Student Deleted Successfully",
             });
@@ -111,8 +143,9 @@ module.exports = {
     changePassword: async (req, res) => {
         const { id } = req.user;
         const { currentPassword, newPassword } = req.body;
+        console.log(req.body)
         try {
-            const existingUser = await Student.findOne({ id: id });
+            const existingUser = await Student.findOne({ where: { id: id } });
             bcrypt.compare(currentPassword, existingUser.password, (err, result) => {
                 if (err) {
                     console.log(err)
@@ -124,7 +157,7 @@ module.exports = {
                         return res.status(400).json({
                             message: 'Current Passsword Not Matched!'
                         })
-                    }else{
+                    } else {
                         bcrypt.hash(newPassword, 11, (err, hash) => {
                             if (!err) {
                                 Student.update({ password: hash }, { where: { id: id } })
@@ -159,13 +192,13 @@ module.exports = {
                 }
             });
             const mailOptions = {
-                from: 'BIMTIAN <noreply@bimtian.org>',
+                from: 'BIMTian <noreply@bimtian.org>',
                 to: email,
                 subject: 'Password Reset Request',
                 text: 'That was easy!',
                 html: `
                 <p>Please Visit on below Link to Change Password</p><br>
-                <a href="http://localhost:3000/forgotPasss/${student.id}/reset">Reset Password</a>
+                <a href="www.bimtian.org/forgotPasss/${student.id}/reset">Reset Password</a>
                 `
             };
             transporter.sendMail(mailOptions, function (error, info) {

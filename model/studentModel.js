@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true
     },
+    numericId:{
+      type: DataTypes.INTEGER,
+    },
     name: {
       type: DataTypes.STRING,
     },
@@ -18,14 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     mobile: {
       type: DataTypes.STRING,
     },
-    course: {
+    photo: {
       type: DataTypes.STRING,
-    },
-    intake: {
-      type: DataTypes.STRING,
-    },
-    photo:{
-        type: DataTypes.STRING,
     },
     gender: {
       type: DataTypes.STRING,
@@ -38,13 +35,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: "pending",
     },
+    course: {
+      type: DataTypes.STRING,
+    },
+    intake: {
+      type: DataTypes.INTEGER,
+    },
     academicStatus: {
       type: DataTypes.STRING,
-      defaultValue: 'student',
+      defaultValue: "student",
     },
     passingYear: {
-      type: DataTypes.STRING,
-      defaultValue: 0,
+      type: DataTypes.INTEGER,
     },
     shareContact: {
       type: DataTypes.STRING,

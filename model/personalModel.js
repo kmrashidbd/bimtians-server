@@ -1,23 +1,21 @@
 module.exports = (sequelize, DataTypes) => {
     const PersonalInfo = sequelize.define("personal_info", {
-        id:{
-          type: DataTypes.UUID,
-          defaultValue: DataTypes.UUIDV4,
-          primaryKey: true
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true
         },
         studentId: {
             type: DataTypes.UUID
         },
         father: {
             type: DataTypes.STRING,
-            allowNull: false,
         },
         mother: {
             type: DataTypes.STRING,
         },
         nId: {
             type: DataTypes.STRING,
-            defaultValue: "user",
         },
         dateOfBirth: {
             type: DataTypes.STRING,
@@ -57,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         timestamps: false
-      });
+    });
 
     return PersonalInfo;
 };
