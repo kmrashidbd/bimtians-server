@@ -5,11 +5,14 @@ module.exports = (sequelize, DataTypes) => {
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true
         },
-        studentId: {
+        postedBy: {
             type: DataTypes.UUID
         },
-        post: {
+        position: {
             type: DataTypes.STRING,
+        },
+        department:{
+            type: DataTypes.STRING
         },
         company: {
             type: DataTypes.STRING,
@@ -25,10 +28,27 @@ module.exports = (sequelize, DataTypes) => {
         },
         requerment: {
             type: DataTypes.STRING
+        },
+        salary:{
+            type: DataTypes.STRING
+        },
+        photo:{
+            type: DataTypes.STRING
+        },
+        link:{
+            type: DataTypes.STRING
+        },
+        description:{
+            type: DataTypes.STRING
+        },
+        status: {
+            type: DataTypes.STRING,
+            defaultValue: 'pending',
+        },
+        availability:{
+            type: DataTypes.DATEONLY
         }
-    }, {
-        timestamps: false
-      });
+    });
 
     return JobInfo;
 };

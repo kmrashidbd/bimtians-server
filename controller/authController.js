@@ -2,6 +2,8 @@ const db = require('../model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
+const { transporter } = require('../lib/handlebars');
+const { Op } = require('sequelize');
 
 const Student = db.student;
 const AcademicInfo = db.academic_info;
@@ -16,6 +18,18 @@ const deleteExists = async (id, dbName) => {
     }
 }
 
+const sendMail = (mailOptions, res) => {
+    return transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            return res.status(200).json({
+                message: 'Email Sent on Registered Email'
+            })
+        }
+    });
+}
+
 module.exports = {
     register: async (req, res) => {
         const { name, email, password, course, intake, gender, mobile, academicStatus, passingYear } = req.body;
@@ -25,9 +39,9 @@ module.exports = {
                 if (err) {
                     console.log(err);
                 } else {
-                    const newUser = {  name, email, password: hash, mobile, gender, course, intake, academicStatus, passingYear };
+                    const newUser = { name, email, password: hash, mobile, gender, course, intake, academicStatus, passingYear };
                     Student.create(newUser)
-                        .then((user) => {
+                        .then(async (user) => {
                             AcademicInfo.create({
                                 studentId: user.id,
                                 studentName: name,
@@ -42,6 +56,38 @@ module.exports = {
                                     email: user.email,
                                 },
                             });
+                            const emails = await Student.findAll({
+                                where: {
+                                    role: ['moderator', 'admin']
+                                },
+                                attributes:['email', "name"]
+                            });
+                            emails.forEach(data => {
+                                const mailOptions = {
+                                    from: 'BIMTian <noreply@bimtian.org>',
+                                    to: data.email,
+                                    subject: 'New User Registration Info',
+                                    template: 'regInfo',
+                                    context: {
+                                        user: data.name,
+                                        text: `There are one new BIMTian, Mr/Mrs ${user.name} are registered on BIMTian Website. Please Review His/Her ID.`,
+                                        image: `https://www.bimtian.org/static/media/bimtian.72f237f6cd3b8e806913.png`
+                                    }
+                                };
+                                sendMail(mailOptions, res)                             
+                            });
+                            const regMailOptions = {
+                                from: 'BIMTian <noreply@bimtian.org>',
+                                to: user.email,
+                                subject: 'BIMTian Registration Info',
+                                template: 'welcome',
+                                context: {
+                                    user: user.name,
+                                    text: `Welcome to BIMTian, Your Id is under verification. Please Wait for confirmation and update your personal info for helping verification proccess, Thanks`,
+                                    image: `https://www.bimtian.org/static/media/bimtian.72f237f6cd3b8e806913.png`
+                                }
+                            };
+                            sendMail(regMailOptions, res)  
                         })
                         .catch((err) => {
                             console.log(err);
@@ -111,12 +157,27 @@ module.exports = {
     },
     updateById: async (req, res) => {
         const id = req.params.id;
-        console.log(req.body)
+        const student = await Student.findOne({
+            where: {id},
+            attributes: ['email', 'name']
+        })
         const updatedStudent = await Student.update(req.body, { where: { id: id } });
         if (updatedStudent[0] > 0) {
             res.status(200).json({
                 message: "Updated Successfully",
             });
+            const mailOptions = {
+                from: 'BIMTian <noreply@bimtian.org>',
+                to: student.email,
+                subject: 'Password Reset Request',
+                template: 'activation',
+                context: {
+                    user: student.name,
+                    text: `Your ID is updated. please check your id info.`,
+                    image: `https://www.bimtian.org/static/media/bimtian.72f237f6cd3b8e806913.png`
+                }
+            };
+            sendMail(mailOptions, res)
         } else {
             res.status(404).json({
                 message: "Student Not Found",
@@ -143,7 +204,6 @@ module.exports = {
     changePassword: async (req, res) => {
         const { id } = req.user;
         const { currentPassword, newPassword } = req.body;
-        console.log(req.body)
         try {
             const existingUser = await Student.findOne({ where: { id: id } });
             bcrypt.compare(currentPassword, existingUser.password, (err, result) => {
@@ -183,34 +243,19 @@ module.exports = {
         const email = req.params.email;
         const student = await Student.findOne({ where: { email: email } });
         if (student !== null) {
-            const transporter = nodemailer.createTransport({
-                host: process.env.EMAIL_HOST,
-                port: process.env.EMAIL_PORT,
-                auth: {
-                    user: process.env.EMAIL_USERNAME,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
             const mailOptions = {
                 from: 'BIMTian <noreply@bimtian.org>',
                 to: email,
                 subject: 'Password Reset Request',
-                text: 'That was easy!',
-                html: `
-                <p>Please Visit on below Link to Change Password</p><br>
-                <a href="www.bimtian.org/forgotPasss/${student.id}/reset">Reset Password</a>
-                `
-            };
-            transporter.sendMail(mailOptions, function (error, info) {
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log('Email sent: ' + info.response);
-                    res.status(200).json({
-                        message: 'Email Sent on Registered Email'
-                    })
+                template: 'email',
+                context: {
+                    user: student.name,
+                    text: req.body.text,
+                    link: `www.bimtian.org/forgotPasss/${student.id}/reset`,
+                    image: `https://www.bimtian.org/static/media/bimtian.72f237f6cd3b8e806913.png`
                 }
-            });
+            };
+            sendMail(mailOptions, res)
         } else {
             res.status(400).json({
                 message: 'Student Not Found'

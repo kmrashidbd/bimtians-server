@@ -33,13 +33,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         presentRoad: {
-            type: DataTypes.UUID
+            type: DataTypes.STRING
         },
         presentDistrict: {
-            type: DataTypes.UUID
+            type: DataTypes.STRING
         },
         presentCountry: {
-            type: DataTypes.UUID
+            type: DataTypes.STRING
         },
         permanentRoad: {
             type: DataTypes.STRING,

@@ -33,6 +33,7 @@ app.use('/api/v1/auth', require('./routes/authRoute'));
 app.use('/api/v1/student', require('./routes/studentRoute'));
 app.use('/api/v1/external', require('./routes/externalRoute'));
 app.use('/api/v1/chat', require('./routes/chatRoute'));
+app.use('/api/v1/job', require('./routes/jobRoute'));
 
 app.get('/', (req, res) => {
     res.send('Marine Student Database Is Running Successfully')

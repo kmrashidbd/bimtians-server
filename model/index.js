@@ -32,6 +32,7 @@ db.others_info = require('./othersModel')(sequelize, DataTypes);
 db.academic_info = require('./academicInfoModel')(sequelize, DataTypes);
 db.employment_info = require('./employmentModel')(sequelize, DataTypes);
 db.chat = require('./chatModel')(sequelize, DataTypes);
+db.job_info = require('./jobInfoModel')(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false })
   .then(() => {
@@ -69,5 +70,9 @@ db.academic_info.belongsTo(db.student,{
   as: 'student'
 })
 
+db.job_info.belongsTo(db.student,{
+  foreignKey: 'postedBy',
+  as: 'student'
+})
 
 module.exports = db;
