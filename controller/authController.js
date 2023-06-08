@@ -1,9 +1,7 @@
 const db = require('../model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const nodemailer = require("nodemailer");
 const { transporter } = require('../lib/handlebars');
-const { Op } = require('sequelize');
 
 const Student = db.student;
 const AcademicInfo = db.academic_info;
@@ -16,7 +14,7 @@ const deleteExists = async (id, dbName) => {
     } else {
         return 'Not Found'
     }
-}
+};
 
 const sendMail = (mailOptions, res) => {
     return transporter.sendMail(mailOptions, function (error, info) {
@@ -28,7 +26,7 @@ const sendMail = (mailOptions, res) => {
             })
         }
     });
-}
+};
 
 module.exports = {
     register: async (req, res) => {
@@ -67,7 +65,7 @@ module.exports = {
                                     from: 'BIMTian <noreply@bimtian.org>',
                                     to: data.email,
                                     subject: 'New User Registration Info',
-                                    template: 'regInfo',
+                                    template: 'template',
                                     context: {
                                         user: data.name,
                                         text: `There are one new BIMTian, Mr/Mrs ${user.name} are registered on BIMTian Website. Please Review His/Her ID.`,
@@ -80,7 +78,7 @@ module.exports = {
                                 from: 'BIMTian <noreply@bimtian.org>',
                                 to: user.email,
                                 subject: 'BIMTian Registration Info',
-                                template: 'welcome',
+                                template: 'template',
                                 context: {
                                     user: user.name,
                                     text: `Welcome to BIMTian, Your Id is under verification. Please Wait for confirmation and update your personal info for helping verification proccess, Thanks`,
@@ -170,7 +168,7 @@ module.exports = {
                 from: 'BIMTian <noreply@bimtian.org>',
                 to: student.email,
                 subject: 'Password Reset Request',
-                template: 'activation',
+                template: 'template',
                 context: {
                     user: student.name,
                     text: `Your ID is updated. please check your id info.`,
@@ -200,6 +198,15 @@ module.exports = {
                 message: "Student Not Found",
             });
         };
+    },
+    adminPanel: async(req, res)=>{
+        const admins = await Student.findAll({
+            where: {
+                role: ['moderator', 'admin']
+            },
+            attributes: ['id', 'name', 'photo', 'numericId', 'role', 'gender']
+        }); 
+        res.status(200).json(admins)
     },
     changePassword: async (req, res) => {
         const { id } = req.user;
@@ -247,7 +254,7 @@ module.exports = {
                 from: 'BIMTian <noreply@bimtian.org>',
                 to: email,
                 subject: 'Password Reset Request',
-                template: 'email',
+                template: 'passwordReset',
                 context: {
                     user: student.name,
                     text: req.body.text,
