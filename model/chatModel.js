@@ -5,14 +5,24 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
         },
-        sender: {
-            type: DataTypes.UUID
-        },
-        receiver: {
-            type: DataTypes.UUID
-        },
-        message: {
+        groupName: {
             type: DataTypes.STRING,
+        },
+        isGroupChat: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        },
+        senderId: {
+            type: DataTypes.UUID
+        },
+        receiverId:{
+            type: DataTypes.UUID
+        },
+        groupAdminId: {
+            type: DataTypes.UUID
+        },
+        latestMessageId: {
+            type: DataTypes.UUID
         }
     });
 

@@ -5,6 +5,7 @@ const verifyToken = require('../lib/verifyToken');
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.post('/sendMessage', authController.sendMessage);
 router.get('/loggedIn', verifyToken, authController.loggedInStudent);
 router.get('/adminPanel', authController.adminPanel);
 router.put('/changePassword', verifyToken, authController.changePassword);

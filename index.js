@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-// const startSocketServer = require('./lib/socketServer');
-const socket = require('socket.io');
-const http = require('http');
 require('dotenv').config();
+const db = require('./model');
 
 const port = process.env.PORT || 4000;
 
@@ -22,9 +20,6 @@ app.use(cors({
     exposedHeaders: ['set-cookie'],
 }));
 
-//socket listening
-const httpServer = http.createServer(app);
-//end of socket listening
 
 app.use('/assets/', express.static('assets'));
 
@@ -43,10 +38,14 @@ const server = app.listen(port, () => {
     console.log(`server is running at port ${port}`)
 });
 
-const io = socket(server,{
+const io = require("socket.io")(server, {
+    pingTimeout: 60000,
     cors: {
-        origin: 'http://localhost:3000',
-        credentials: true
+        origin: [
+            'http://localhost:3000',
+            "http://bimtian.org",
+            "https://bimtian.org",
+        ],
     }
 });
 
@@ -54,36 +53,59 @@ global.onlineUsers = new Map();
 
 let activeUsers = [];
 
-io.on('connection', (socket) => {
-    console.log('A user has connected');
+io.on("connection", (socket) => {
+    console.log('connected to socket.io');
     global.chatSocket = socket;
-
-    socket.on("add-user", (userId)=>{
-        onlineUsers.set(userId, socket.id)
-        if(!activeUsers.some(user=>user.userId === userId)){
+    //connect loggedin user
+    socket.on('setup', (userData) => {
+        onlineUsers.set(userData.id, socket.id)
+        socket.join(userData.id);
+        if(!activeUsers.some(user=>user.userId === userData.id)){
             activeUsers.push({
-                userId,
+                userId: userData.id,
                 socketId: socket.id
             })
         }
-        io.emit('get-users', activeUsers)
-    })
+        socket.emit('connected', activeUsers);
+    });
 
-    socket.on('send-message',(data)=>{
-        const sendUserSocket = onlineUsers.get(data.receiver);
-        if(sendUserSocket){
-            socket.to(sendUserSocket).emit('msg-receive', data.msg)
+    socket.on('join chat', (room) => {
+        socket.join(room);
+    });
+
+    socket.on("typing", (room) => socket.in(room).emit("typing"));
+    socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+
+    socket.on('new message', async (newMessageRecieved) => {
+        // console.log(newMessageRecieved)
+        const chatUsers = [];
+        let chat = newMessageRecieved.chat;
+        const data = await db.chat.findOne({
+            where:{id: chat}
+        })
+        if(data.isGroupChat){
+            const groupUsers = await db.chat_user.findAll({
+                where: {
+                    chat: data.id
+                }
+            })
+            groupUsers.forEach(user => {
+                chatUsers.push(user.user)
+            });
+        }else{
+            chatUsers.push(data.senderId, data.receiverId)
         }
-    })
 
-    socket.on('disconnect', () => {
+        chatUsers.forEach(async (user) => {
+            if (user === newMessageRecieved.senderId) return;
+            socket.in(user).emit("message recieved", newMessageRecieved);
+        })
+    });
+
+    socket.off("setup", (userData)=>{
         activeUsers = activeUsers.filter(user=>user.socketId !== socket.id);
-        console.log('A user has disconnected', activeUsers);
-        io.emit('get-users', activeUsers)
-    });
-
-    socket.on('message', (data) => {
-        console.log('Received message:', data);
-        socket.broadcast.emit('message', data);
-    });
-});
+        socket.emit('connected', activeUsers);
+        socket.leave(userData.id)
+        console.log("user disconnected");
+    })
+})
